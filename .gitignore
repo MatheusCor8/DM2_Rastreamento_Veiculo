@@ -30,3 +30,6 @@ Thumbs.db
 
 # Gradle daemon
 gradle/gradle-daemon-jvm.properties
+
+# Firebase
+google-services.json
