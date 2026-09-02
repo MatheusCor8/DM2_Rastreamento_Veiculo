@@ -24,3 +24,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "RastreamentoVeiculo"
 include(":app")
+include(":pocs:e1-auth")
+include(":pocs:e2-sqlite")

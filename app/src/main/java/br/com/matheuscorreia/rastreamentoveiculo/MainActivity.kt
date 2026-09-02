@@ -1,98 +1,60 @@
 package br.com.matheuscorreia.rastreamentoveiculo
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import br.com.matheuscorreia.rastreamentoveiculo.ui.theme.RastreamentoVeiculoTheme
+import br.com.matheuscorreia.rastreamentoveiculo.ui.screens.*
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             RastreamentoVeiculoTheme {
-                LoginScreen(FirebaseAuth.getInstance())
+                AppNavigation()
             }
         }
     }
 }
 
 @Composable
-fun LoginScreen(auth: FirebaseAuth? = null) {
+fun AppNavigation() {
+    val navController = rememberNavController()
+    val auth = FirebaseAuth.getInstance()
 
-    val context = LocalContext.current
-
-    var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        Text(
-            text = "Rastreamento de Veículos",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("E-mail") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = senha,
-            onValueChange = { senha = it },
-            label = { Text("Senha") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-
-                auth?.signInWithEmailAndPassword(email, senha)
-                    ?.addOnCompleteListener { task ->
-
-                        if (task.isSuccessful) {
-                            Toast.makeText(
-                                context,
-                                "Login realizado com sucesso",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Falha no login",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(auth = auth) {
+                navController.navigate("home")
+            }
+        }
+        composable("home") {
+            HomeScreen(
+                onNavigateToVehicle = { navController.navigate("register_vehicle") },
+                onNavigateToDriver = { navController.navigate("register_driver") },
+                onLogout = {
+                    auth.signOut()
+                    navController.navigate("login") {
+                        popUpTo("home") { inclusive = true }
                     }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Entrar")
+                }
+            )
+        }
+        composable("register_vehicle") {
+            VehicleRegistrationScreen {
+                navController.popBackStack()
+            }
+        }
+        composable("register_driver") {
+            DriverRegistrationScreen {
+                navController.popBackStack()
+            }
         }
     }
 }
@@ -101,6 +63,6 @@ fun LoginScreen(auth: FirebaseAuth? = null) {
 @Composable
 fun LoginPreview() {
     RastreamentoVeiculoTheme {
-        LoginScreen()
+        LoginScreen(onLoginSuccess = {})
     }
 }
