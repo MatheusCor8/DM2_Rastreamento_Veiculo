@@ -10,51 +10,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import br.com.matheuscorreia.rastreamentoveiculo.data.local.AppDatabase
-import br.com.matheuscorreia.rastreamentoveiculo.data.model.Product
+import br.com.matheuscorreia.rastreamentoveiculo.data.model.Merchant
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProductRegistrationScreen(onNavigateBack: () -> Unit) {
+fun MerchantRegistrationScreen(onNavigateBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val db = AppDatabase.getDatabase(context)
-    val products by db.productDao().getAllProducts().collectAsState(initial = emptyList())
+    val merchants by db.merchantDao().getAllMerchants().collectAsState(initial = emptyList())
 
     var name by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Cadastro de Produto", style = MaterialTheme.typography.headlineMedium)
-
+        Text(text = "Cadastro de Negociante", style = MaterialTheme.typography.headlineMedium)
+        
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = name,
             onValueChange = { name = it },
-            label = { Text("Nome do Produto") },
+            label = { Text("Nome") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = category,
-            onValueChange = { category = it },
-            label = { Text("Categoria") },
+            value = address,
+            onValueChange = { address = it },
+            label = { Text("Endereço") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = price,
-            onValueChange = { price = it },
-            label = { Text("Preço") },
+            value = phone,
+            onValueChange = { phone = it },
+            label = { Text("Telefone") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -62,17 +62,14 @@ fun ProductRegistrationScreen(onNavigateBack: () -> Unit) {
 
         Button(
             onClick = {
-                val priceDouble = price.toDoubleOrNull()
-                if (name.isNotBlank() && category.isNotBlank() && priceDouble != null) {
+                if (name.isNotBlank() && address.isNotBlank() && phone.isNotBlank()) {
                     scope.launch {
-                        db.productDao().insert(Product(name = name, category = category, price = priceDouble))
-                        Toast.makeText(context, "Produto salvo!", Toast.LENGTH_SHORT).show()
+                        db.merchantDao().insert(Merchant(name = name, address = address, phone = phone))
+                        Toast.makeText(context, "Negociante salvo!", Toast.LENGTH_SHORT).show()
                         name = ""
-                        category = ""
-                        price = ""
+                        address = ""
+                        phone = ""
                     }
-                } else {
-                    Toast.makeText(context, "Dados inválidos", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -87,15 +84,15 @@ fun ProductRegistrationScreen(onNavigateBack: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Text(text = "Produtos Cadastrados:", style = MaterialTheme.typography.titleMedium)
+        Text(text = "Negociantes Cadastrados:", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(products) { product ->
+            items(merchants) { merchant ->
                 Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "Nome: ${product.name}")
-                        Text(text = "Preço: R$ ${product.price}")
+                        Text(text = "Nome: ${merchant.name}")
+                        Text(text = "Endereço: ${merchant.address}")
                     }
                 }
             }

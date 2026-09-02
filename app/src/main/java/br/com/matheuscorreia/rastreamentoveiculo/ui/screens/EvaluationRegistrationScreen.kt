@@ -10,51 +10,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import br.com.matheuscorreia.rastreamentoveiculo.data.local.AppDatabase
-import br.com.matheuscorreia.rastreamentoveiculo.data.model.Product
+import br.com.matheuscorreia.rastreamentoveiculo.data.model.ProductEvaluation
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProductRegistrationScreen(onNavigateBack: () -> Unit) {
+fun EvaluationRegistrationScreen(onNavigateBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val db = AppDatabase.getDatabase(context)
-    val products by db.productDao().getAllProducts().collectAsState(initial = emptyList())
+    val evaluations by db.evaluationDao().getAllEvaluations().collectAsState(initial = emptyList())
 
-    var name by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+    var productId by remember { mutableStateOf("") }
+    var rating by remember { mutableStateOf("") }
+    var comment by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text(text = "Cadastro de Produto", style = MaterialTheme.typography.headlineMedium)
-
+        Text(text = "Avaliação de Produto", style = MaterialTheme.typography.headlineMedium)
+        
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nome do Produto") },
+            value = productId,
+            onValueChange = { productId = it },
+            label = { Text("ID do Produto") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = category,
-            onValueChange = { category = it },
-            label = { Text("Categoria") },
+            value = rating,
+            onValueChange = { rating = it },
+            label = { Text("Nota (1-5)") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
-            value = price,
-            onValueChange = { price = it },
-            label = { Text("Preço") },
+            value = comment,
+            onValueChange = { comment = it },
+            label = { Text("Comentário") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -62,17 +62,16 @@ fun ProductRegistrationScreen(onNavigateBack: () -> Unit) {
 
         Button(
             onClick = {
-                val priceDouble = price.toDoubleOrNull()
-                if (name.isNotBlank() && category.isNotBlank() && priceDouble != null) {
+                val pId = productId.toIntOrNull()
+                val r = rating.toIntOrNull()
+                if (pId != null && r != null && comment.isNotBlank()) {
                     scope.launch {
-                        db.productDao().insert(Product(name = name, category = category, price = priceDouble))
-                        Toast.makeText(context, "Produto salvo!", Toast.LENGTH_SHORT).show()
-                        name = ""
-                        category = ""
-                        price = ""
+                        db.evaluationDao().insert(ProductEvaluation(productId = pId, rating = r, comment = comment))
+                        Toast.makeText(context, "Avaliação salva!", Toast.LENGTH_SHORT).show()
+                        productId = ""
+                        rating = ""
+                        comment = ""
                     }
-                } else {
-                    Toast.makeText(context, "Dados inválidos", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -87,15 +86,16 @@ fun ProductRegistrationScreen(onNavigateBack: () -> Unit) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-        Text(text = "Produtos Cadastrados:", style = MaterialTheme.typography.titleMedium)
+        Text(text = "Avaliações Cadastradas:", style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(products) { product ->
+            items(evaluations) { evaluation ->
                 Card(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(text = "Nome: ${product.name}")
-                        Text(text = "Preço: R$ ${product.price}")
+                        Text(text = "Produto ID: ${evaluation.productId}")
+                        Text(text = "Nota: ${evaluation.rating}")
+                        Text(text = "Comentário: ${evaluation.comment}")
                     }
                 }
             }

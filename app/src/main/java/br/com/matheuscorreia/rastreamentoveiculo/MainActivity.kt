@@ -38,6 +38,9 @@ fun AppNavigation() {
             HomeScreen(
                 onNavigateToVehicle = { navController.navigate("register_vehicle") },
                 onNavigateToDriver = { navController.navigate("register_driver") },
+                onNavigateToProduct = { navController.navigate("register_product") },
+                onNavigateToMerchant = { navController.navigate("register_merchant") },
+                onNavigateToEvaluation = { navController.navigate("register_evaluation") },
                 onLogout = {
                     auth.signOut()
                     navController.navigate("login") {
@@ -53,6 +56,21 @@ fun AppNavigation() {
         }
         composable("register_driver") {
             DriverRegistrationScreen {
+                navController.popBackStack()
+            }
+        }
+        composable("register_product") {
+            ProductRegistrationScreen {
+                navController.popBackStack()
+            }
+        }
+        composable("register_merchant") {
+            MerchantRegistrationScreen {
+                navController.popBackStack()
+            }
+        }
+        composable("register_evaluation") {
+            EvaluationRegistrationScreen {
                 navController.popBackStack()
             }
         }

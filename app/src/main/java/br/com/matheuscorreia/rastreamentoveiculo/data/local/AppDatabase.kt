@@ -14,6 +14,9 @@ import br.com.matheuscorreia.rastreamentoveiculo.data.model.*
 abstract class AppDatabase : RoomDatabase() {
     abstract fun vehicleDao(): VehicleDao
     abstract fun driverDao(): DriverDao
+    abstract fun productDao(): ProductDao
+    abstract fun merchantDao(): MerchantDao
+    abstract fun evaluationDao(): EvaluationDao
 
     companion object {
         @Volatile
