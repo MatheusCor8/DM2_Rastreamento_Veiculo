@@ -7,16 +7,13 @@ import androidx.room.RoomDatabase
 import br.com.matheuscorreia.rastreamentoveiculo.data.model.*
 
 @Database(
-    entities = [Vehicle::class, Driver::class, Product::class, Merchant::class, ProductEvaluation::class],
+    entities = [Vehicle::class, Driver::class],
     version = 1,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun vehicleDao(): VehicleDao
     abstract fun driverDao(): DriverDao
-    abstract fun productDao(): ProductDao
-    abstract fun merchantDao(): MerchantDao
-    abstract fun evaluationDao(): EvaluationDao
 
     companion object {
         @Volatile
